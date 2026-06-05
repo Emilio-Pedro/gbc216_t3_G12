@@ -211,3 +211,212 @@ Isso ocorre porque o histograma já fica relativamente distribuído após a prim
 A curva de transformação representa como os níveis de intensidade originais foram convertidos após a equalização.
 
 Ela é baseada na distribuição acumulada dos pixels da imagem.
+
+# Laboratório 4 - Filtragem Espacial
+
+## Filtragem Espacial
+
+Filtros espaciais são operações aplicadas diretamente sobre os pixels da imagem utilizando uma vizinhança local chamada máscara ou kernel.
+
+O objetivo pode ser:
+
+* suavizar ruídos
+* reduzir detalhes
+* realçar estruturas
+* preparar a imagem para etapas posteriores de processamento
+
+Cada pixel da imagem é recalculado com base nos pixels vizinhos definidos pela máscara.
+
+---
+
+## Filtro da Média
+
+O filtro da média realiza a suavização da imagem substituindo cada pixel pela média dos valores presentes em sua vizinhança.
+
+Exemplo de máscara:
+
+```python
+3x3
+```
+
+ou
+
+```python
+7x7
+```
+
+No OpenCV foi utilizado:
+
+```python
+cv2.blur()
+```
+
+---
+
+## Funcionamento
+
+Para cada pixel:
+
+1. seleciona-se a vizinhança definida pela máscara
+2. calcula-se a média dos valores
+3. o pixel central recebe esse valor médio
+
+Isso reduz variações locais e suaviza a imagem.
+
+---
+
+## Efeito do Tamanho da Máscara
+
+Foram aplicados:
+
+* filtro média 3×3
+* filtro média 7×7
+* filtro média 3×3 aplicado três vezes consecutivas
+
+Observou-se que:
+
+* máscaras menores preservam mais detalhes
+* máscaras maiores produzem maior borramento
+* aplicações sucessivas aumentam gradualmente a suavização
+
+O filtro 7×7 apresentou o maior nível de borramento da imagem.
+
+---
+
+## Filtro Gaussiano
+
+O filtro Gaussiano também realiza suavização, porém utiliza pesos diferentes para cada pixel da vizinhança.
+
+Pixels mais próximos do centro possuem maior influência no resultado.
+
+No OpenCV foi utilizado:
+
+```python
+cv2.GaussianBlur()
+```
+
+---
+
+## Desvio Padrão (σ)
+
+O parâmetro σ (sigma) controla a dispersão da função Gaussiana.
+
+* σ pequeno → suavização leve
+* σ grande → suavização intensa
+
+Foram utilizados:
+
+```python
+σ = 1.0  → kernel 5×5
+σ = 2.0  → kernel 9×9
+σ = 4.0  → kernel 15×15
+```
+
+Observou-se que o aumento de σ e do tamanho da máscara produz maior borramento e redução de detalhes.
+
+---
+
+## Comparação entre Média e Gaussiano
+
+Ambos os filtros realizam suavização.
+
+Diferença principal:
+
+* Filtro da Média:
+
+  * todos os pixels possuem o mesmo peso
+  * produz borramento mais uniforme
+
+* Filtro Gaussiano:
+
+  * pixels centrais possuem maior peso
+  * preserva melhor as bordas
+  * gera resultados visualmente mais naturais
+
+---
+
+## Ruído Salt and Pepper
+
+O ruído Salt and Pepper é caracterizado pelo aparecimento de pixels isolados muito claros (salt) e muito escuros (pepper).
+
+Esse tipo de ruído afeta significativamente a qualidade visual da imagem.
+
+---
+
+## Filtro da Mediana
+
+O filtro da mediana substitui cada pixel pela mediana dos valores presentes em sua vizinhança.
+
+No OpenCV foi utilizado:
+
+```python
+cv2.medianBlur()
+```
+
+Foram aplicadas máscaras:
+
+```python
+3×3
+```
+
+e
+
+```python
+7×7
+```
+
+---
+
+## Funcionamento do Filtro da Mediana
+
+Para cada pixel:
+
+1. seleciona-se a vizinhança
+2. os valores são ordenados
+3. calcula-se a mediana
+4. o pixel central recebe esse valor
+
+Exemplo:
+
+```text
+10  12  15
+11 255  14
+13  12  11
+```
+
+Valores ordenados:
+
+```text
+10 11 11 12 12 13 14 15 255
+```
+
+Mediana:
+
+```text
+12
+```
+
+O valor 255, característico do ruído, é removido naturalmente.
+
+---
+
+## Implementação Manual da Mediana
+
+O filtro da mediana também foi implementado manualmente utilizando:
+
+```python
+numpy.median()
+```
+
+Sem utilizar:
+
+```python
+cv2.medianBlur()
+```
+
+Para cada pixel:
+
+```python
+janela = img_pad[i:i+tamanho, j:j+tamanho]
+resultado[i,j] = np.median(janela)
+```
